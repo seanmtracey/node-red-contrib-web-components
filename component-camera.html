@@ -1,0 +1,41 @@
+<script type="text/javascript">
+    RED.nodes.registerType('component-camera',{
+        category: 'Web Components',
+        color: '#F9FB56',
+        defaults: {
+            name: {
+                value: ""
+            },
+            unique : {
+                value : ""
+            }
+        },
+        inputs:0,
+        outputs:1,
+        icon: "component-camera.png",
+        label: function() {
+            return this.name || "Component Camera";
+        },
+        oneditprepare : function(){
+            var node = this;
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="component-camera">
+   
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-unique"><i class="icon-tag"></i>Connection ID</label>
+        <input type="text" id="node-input-unique" placeholder="Enter a unique name" />
+    </div>
+
+</script>
+
+<script type="text/x-red" data-help-name="component-camera">
+    <p>A node that connects to a client-side web component to transfer data from a camera to Node-RED</p>
+</script>
