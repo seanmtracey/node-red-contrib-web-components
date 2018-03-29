@@ -24,7 +24,7 @@
                 min-height: 300px;
             }
 
-            main[data-state="inactive"] canvas, main[data-state="inactive"] video, main[data-state="inactive"] #controls{
+            main[data-state="inactive"] #preview{
                 display: none;
             }
 
@@ -45,19 +45,38 @@
                 display: none;
             }
 
-            main video{
+            main #preview{
+                display: flex;
+                align-items: center;
+                min-height: 300px;
+                background: #e8e7e7;
+                /*padding: 1em;*/
+                box-sizing: border-box;
+                flex-direction: column;
+            }
+
+            main #preview video{
                 position: fixed;
                 left: 100%;
                 top: 100%;
             }
 
-            main canvas{
+            main #preview canvas{
                 width: 300px;
             }
 
-            main #controls{
+            main #preview #controls{
                 margin: 1em;
                 box-sizing: border-box;
+            }
+
+            main #preview #capture{
+                background: #3d70b2;
+                border: 1px solid transparent;
+                color: white;
+                padding: 1em;
+                box-sizing: border-box;
+                cursor: pointer;
             }
 
         </style>
@@ -68,12 +87,16 @@
                 <p>click to use camera</p>
             </div>
             
-            <canvas> </canvas>
-            <video> </video>
+            <div id="preview">
+                <canvas> </canvas>
+                <video> </video>
+                
+                <div id="controls">
+                    <button id="capture">Take Picture</div>
+                </div>
 
-            <div id="controls">
-                <button id="capture">Take Picture</div>
             </div>
+
 
         </main>
 
@@ -205,11 +228,11 @@
 
         window.customElements.define('node-red-camera', NRCamera);
 
-        if(document.querySelector('node-red-camera') !== undefined){
+        /*if(document.querySelector('node-red-camera') !== undefined){
             const S = document.createElement('style');
             S.innerHTML = parentCSS;
             document.head.appendChild(S);
-        }
+        }*/
 
     });
     
