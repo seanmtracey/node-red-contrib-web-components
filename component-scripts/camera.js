@@ -114,8 +114,17 @@
                 }
 
                 function sendImageToServer(image){
+
+                    const options = {
+                        method : "POST",
+                        headers : {
+                            "Content-Type" : "application/octet-stream"
+                        },
+                        body : image
+                    }
+
                     console.log(`${window.location.origin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}`);
-                    return fetch(`${window.location.origin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}`)
+                    return fetch(`${window.location.origin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}`, options)
                         .then(res => {
 
                             if(res.ok){
@@ -145,7 +154,6 @@
 
                     activate.querySelector('p').textContent = 'attempting to access camera';
 
-                    
                     const constraints = {
                         video : true,
                         audio : false
@@ -172,7 +180,10 @@
                             
                             capture.addEventListener('click', function(){
 
-                                sendImageToServer();
+                                const base64 = canvas.toDataURL('image/png');
+                                const imageData = base64.split(',')[1];
+
+                                sendImageToServer(imageData);
 
                             }, false);
 

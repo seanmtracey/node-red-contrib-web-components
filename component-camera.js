@@ -17,11 +17,36 @@ module.exports = function(RED) {
 
         if(config.unique && config.unique !== ''){
 
-            RED.httpNode.get(`/nr-component-camera/${config.unique.split('/')[0]}`, function(req, res) {
-                res.end();
-                node.send({
-                    payload: TEST_IMAGE
+            RED.httpNode.post(`/nr-component-camera/${config.unique.split('/')[0]}`, function(req, res) {
+
+                const chunks = [];
+
+                req.on('data', function (data) {
+                    debug('Data:', data);
+                    chunks.push(data);
                 });
+
+                req.on('end', function (data){
+                    
+                    debug('Request ended:', data);
+
+                    res.json({
+                        status : "ok",
+                        message : "Date received successfully"
+                    });
+                    
+                    const buf = new Buffer( Buffer.concat(chunks).toString(), 'base64' );
+
+                    node.send({
+                        payload: buf
+                    });
+                    
+                });
+
+                req.on('error:', function(err){
+                    debug('req err:', err);
+                });
+
             });
 
         }
