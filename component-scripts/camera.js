@@ -37,8 +37,16 @@
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
-                color: #7d7d7d;
-                font-weight: 800;
+            }
+
+            main #activate p, main #previw p {
+                width: 100%;
+                text-align: center;
+                color: white;
+                background: #9c9c9c;
+                padding: 1em 0;
+                text-shadow: 0 1px 1px black;
+                font-weight: 400;
             }
 
             main[data-state="active"] #activate {
@@ -88,6 +96,7 @@
             </div>
             
             <div id="preview">
+
                 <canvas> </canvas>
                 <video> </video>
                 
