@@ -88,18 +88,18 @@
             }
 
         </style>
-        
+
         <main data-state="inactive">
 
             <div id="activate">
                 <p>click to use camera</p>
             </div>
-            
+
             <div id="preview">
 
                 <canvas> </canvas>
-                <video> </video>
-                
+                <video autoplay> </video>
+
                 <div id="controls">
                     <button id="capture">Take Picture</div>
                 </div>
@@ -114,18 +114,17 @@
     const templateElement = document.createElement('template');
     templateElement.innerHTML = templateString;
 
-        
+
     document.addEventListener("DOMContentLoaded", function(event) {
         console.log('DOM Loaded, ready to look for components');
 
         class NRCamera extends HTMLElement {
-            
+
             constructor() {
                 super();
-                console.log(this);
 
                 const domNode = this;
-                
+
                 domNode.attachShadow({mode: 'open'});
                 domNode.shadowRoot.appendChild(document.importNode(templateElement.content, true));
 
@@ -160,7 +159,7 @@
                         .then(res => {
 
                             if(res.ok){
-                                return res.text();
+                                return res.json();
                             } else {
                                 throw res;
                             }
@@ -168,9 +167,25 @@
                         })
                         .then(response => {
                             console.log('response:', response);
+
+                            const messageEvent = new CustomEvent('message', {
+                                bubbles: true,
+                                detail: response
+                            });
+
+                            domNode.dispatchEvent(messageEvent);
+
                         })
                         .catch(err => {
                             console.log('fetch err:', err);
+
+                            const errorEvent = new CustomEvent('error', {
+                                bubbles: true,
+                                detail: err
+                            });
+
+                            domNode.dispatchEvent(errorEvent);
+
                         })
                     ;
 
@@ -190,11 +205,13 @@
                         video : true,
                         audio : false
                     };
-                    
+
                     navigator.mediaDevices.getUserMedia(constraints)
                         .then(function(stream) {
                             console.log(stream);
-                
+
+                            const externalStream = stream.clone();
+
                             video.addEventListener('canplay', function(){
                                 this.play();
 
@@ -204,12 +221,19 @@
 
                                 canvas.width = video.offsetWidth;
                                 canvas.height = video.offsetHeight;
-                
+
+                                const captureEvent = new CustomEvent('streamavailable', {
+                                    bubbles: true,
+                                    detail: externalStream
+                                });
+    
+                                domNode.dispatchEvent(captureEvent);
+
                             });
-                
+
                             const vidURL = window.URL.createObjectURL(stream);
                             video.src = vidURL;
-                            
+
                             capture.addEventListener('click', function(){
 
                                 const base64 = canvas.toDataURL('image/png');
@@ -220,14 +244,21 @@
                             }, false);
 
                             drawVideoToCanvas();
-                          
+
                         })
                         .catch(function(err) {
-                            console.log('gUM Error:', err);
+
+                            const errorEvent = new CustomEvent('error', {
+                                bubbles: true,
+                                detail: err
+                            });
+
+                            domNode.dispatchEvent(errorEvent);
+
                         })
                     ;
 
-                    
+
 
                 }, false);
 
@@ -237,12 +268,6 @@
 
         window.customElements.define('node-red-camera', NRCamera);
 
-        /*if(document.querySelector('node-red-camera') !== undefined){
-            const S = document.createElement('style');
-            S.innerHTML = parentCSS;
-            document.head.appendChild(S);
-        }*/
-
     });
-    
+
 }());
