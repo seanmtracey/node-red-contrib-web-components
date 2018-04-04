@@ -40,7 +40,7 @@ module.exports = function(RED) {
                     node.send({
                         payload: buf
                     });
-                    
+
                 });
 
                 req.on('error:', function(err){
@@ -53,9 +53,9 @@ module.exports = function(RED) {
 
     });
 
-    RED.httpNode.get("/web-components", function(req, res) {
+    RED.httpNode.get("/web-components/:type", function(req, res) {
         
-        fs.readFile(`${__dirname}/component-scripts/camera.js`, (err, data) => {
+        fs.readFile(`${__dirname}/component-scripts/${req.params.type}.js`, (err, data) => {
             
             if(err){
                 debug('FS err:', err);
