@@ -212,8 +212,6 @@
                             const externalStream = stream.clone();
 
                             video.addEventListener('canplay', function(){
-                                
-                                console.log('Can Play Event');
 
                                 this.play();
 
@@ -228,7 +226,7 @@
                                     bubbles: true,
                                     detail: externalStream
                                 });
-    
+
                                 domNode.dispatchEvent(streamavailableEvent);
 
                             });
@@ -240,14 +238,13 @@
 
                                 console.log('err:', err);
                                 video.srcObject = stream;
-                                
+
                                 setTimeout(function(){
                                     console.log('Video is playing', !video.paused);
                                     if(video.paused){
                                         video.play();
                                     }
                                 }, 1000);
-
 
                             }
 
