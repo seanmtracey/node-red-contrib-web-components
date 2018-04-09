@@ -2,10 +2,6 @@ require('dotenv').config( { silent : process.env.NODE_ENV === 'production' } );
 const debug = require('debug')('web-components:component-camera');
 const fs = require('fs');
 
-const TEST_IMAGE = fs.readFileSync(`${__dirname}/resources/test.jpg`);
-
-debug('TEST_IMAGE:', TEST_IMAGE);
-
 module.exports = function(RED) {
 
     RED.nodes.registerType("component-camera", function(config){

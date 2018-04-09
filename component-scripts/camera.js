@@ -73,7 +73,7 @@
                 width: 300px;
             }
 
-            main #preview #controls{
+            main #preview .controls{
                 margin: 1em;
                 box-sizing: border-box;
             }
@@ -98,9 +98,9 @@
             <div id="preview">
 
                 <canvas> </canvas>
-                <video autoplay> </video>
+                <video autoplay playsinline> </video>
 
-                <div id="controls">
+                <div class="controls still">
                     <button id="capture">Take Picture</div>
                 </div>
 
@@ -113,7 +113,6 @@
 
     const templateElement = document.createElement('template');
     templateElement.innerHTML = templateString;
-
 
     document.addEventListener("DOMContentLoaded", function(event) {
         console.log('DOM Loaded, ready to look for components');
@@ -136,8 +135,8 @@
                 const video = domNode.shadowRoot.querySelector('video');
                 const canvas = domNode.shadowRoot.querySelector('canvas');
                 const ctx = canvas.getContext('2d');
-                const controls = main.querySelector('#controls');
-                const capture = controls.querySelector('#capture');
+                const stillControls = main.querySelector('.controls.still');
+                const stillCapture = stillControls.querySelector('#capture');
 
                 function drawVideoToCanvas(){
                     ctx.drawImage(video, 0, 0);
@@ -202,7 +201,7 @@
                     activate.querySelector('p').textContent = 'attempting to access camera';
 
                     const constraints = {
-                        video : true,
+                        video : { facingMode: "environment" } ,
                         audio : false
                     };
 
@@ -213,6 +212,9 @@
                             const externalStream = stream.clone();
 
                             video.addEventListener('canplay', function(){
+                                
+                                console.log('Can Play Event');
+
                                 this.play();
 
                                 if(main.dataset.state === 'inactive'){
@@ -222,19 +224,34 @@
                                 canvas.width = video.offsetWidth;
                                 canvas.height = video.offsetHeight;
 
-                                const captureEvent = new CustomEvent('streamavailable', {
+                                const streamavailableEvent = new CustomEvent('streamavailable', {
                                     bubbles: true,
                                     detail: externalStream
                                 });
     
-                                domNode.dispatchEvent(captureEvent);
+                                domNode.dispatchEvent(streamavailableEvent);
 
                             });
 
-                            const vidURL = window.URL.createObjectURL(stream);
-                            video.src = vidURL;
+                            try{
+                                const vidURL = window.URL.createObjectURL(stream);
+                                video.src = vidURL;
+                            } catch(err){
 
-                            capture.addEventListener('click', function(){
+                                console.log('err:', err);
+                                video.srcObject = stream;
+                                
+                                setTimeout(function(){
+                                    console.log('Video is playing', !video.paused);
+                                    if(video.paused){
+                                        video.play();
+                                    }
+                                }, 1000);
+
+
+                            }
+
+                            stillCapture.addEventListener('click', function(){
 
                                 const base64 = canvas.toDataURL('image/png');
                                 const imageData = base64.split(',')[1];
@@ -247,6 +264,8 @@
 
                         })
                         .catch(function(err) {
+
+                            console.log(err);
 
                             const errorEvent = new CustomEvent('error', {
                                 bubbles: true,
