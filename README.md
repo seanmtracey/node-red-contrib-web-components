@@ -60,7 +60,6 @@ This node / component pair creates a GUI in a web page which enables the user to
 
 **HTML Node**
 
-
 ```HTML
 <node-red-camera data-nr-name="camera1"></node-red-camera>
 ```
