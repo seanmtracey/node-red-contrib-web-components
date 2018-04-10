@@ -223,28 +223,24 @@
                         })
                         .then(response => {
                             console.log('response:', response);
-
-                            const messageEvent = new CustomEvent('message', {
-                                bubbles: true,
-                                detail: response
-                            });
-
-                            domNode.dispatchEvent(messageEvent);
-
+                            dispatchEvent('message', response);
                         })
                         .catch(err => {
                             console.log('fetch err:', err);
-
-                            const errorEvent = new CustomEvent('error', {
-                                bubbles: true,
-                                detail: err
-                            });
-
-                            domNode.dispatchEvent(errorEvent);
+                            dispatchEvent('error', err);
 
                         })
                     ;
 
+                }
+
+                function dispatchEvent(name, data){
+                    const event = new CustomEvent(name, {
+                        bubbles: true,
+                        detail: data
+                    });
+
+                    domNode.dispatchEvent(event);
                 }
 
                 activate.addEventListener('click', function(){
@@ -279,12 +275,7 @@
                                 canvas.width = video.offsetWidth;
                                 canvas.height = video.offsetHeight;
 
-                                const streamavailableEvent = new CustomEvent('streamavailable', {
-                                    bubbles: true,
-                                    detail: externalStream
-                                });
-
-                                domNode.dispatchEvent(streamavailableEvent);
+                                dispatchEvent('streamavailable', externalStream);
 
                             });
 
@@ -310,6 +301,8 @@
                                 const base64 = canvas.toDataURL('image/png');
                                 const imageData = base64.split(',')[1];
 
+                                dispatchEvent('imageavailable', base64);
+
                                 sendDataToServer(imageData);
 
                             }, false);
@@ -333,6 +326,8 @@
                                     video.controls = true;
                                     var blob = new Blob(capturedChunks, { 'type' : 'audio/webm; codecs=vp8' });
                                     
+                                    dispatchEvent('videoavailable', blob);
+
                                     sendDataToServer(blob, captureType);
                                     
                                     capturedChunks.length = 0;
@@ -355,13 +350,7 @@
                         .catch(function(err) {
 
                             console.log(err);
-
-                            const errorEvent = new CustomEvent('error', {
-                                bubbles: true,
-                                detail: err
-                            });
-
-                            domNode.dispatchEvent(errorEvent);
+                            dispatchEvent('error', err);
 
                         })
                     ;
