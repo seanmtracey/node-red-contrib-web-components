@@ -208,7 +208,7 @@
                             "Content-Type" : "application/octet-stream"
                         },
                         body : data
-                    }
+                    };
 
                     console.log(`${window.location.origin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}?type=${type}`);
                     return fetch(`${window.location.origin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}?type=${type}`, options)
@@ -228,7 +228,6 @@
                         .catch(err => {
                             console.log('fetch err:', err);
                             dispatchEvent('error', err);
-
                         })
                     ;
 
