@@ -31,11 +31,19 @@ module.exports = function(RED) {
                         message : "Date received successfully"
                     });
                     
-                    const buf = new Buffer( Buffer.concat(chunks).toString(), 'base64' );
+                    let buf;
+
+                    if(req.query.type === 'still'){
+                        buf = new Buffer( Buffer.concat(chunks).toString(), 'base64' );
+                    } else if(req.query.type === "video"){
+                        buf = Buffer.concat(chunks);
+                    }
 
                     node.send({
                         payload: buf
                     });
+
+                    // fs.writeFileSync('/tmp/output.webm', buf);
 
                 });
 

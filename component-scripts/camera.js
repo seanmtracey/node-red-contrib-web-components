@@ -28,6 +28,18 @@
                 display: none;
             }
 
+            main[data-type="still"] #preview .controls.video{
+                display: none;
+            }
+
+            main[data-type="video"] #preview .controls.still{
+                display: none;
+            }
+
+            main #activate, main #preview{
+                border: 1px solid #c7c7c7;
+            }
+            
             main #activate{
                 width: 100%;
                 max-width: 300px;
@@ -58,7 +70,7 @@
                 align-items: center;
                 min-height: 300px;
                 background: #e8e7e7;
-                /*padding: 1em;*/
+                /* padding: 1em; */
                 box-sizing: border-box;
                 flex-direction: column;
             }
@@ -78,7 +90,7 @@
                 box-sizing: border-box;
             }
 
-            main #preview #capture{
+            main #preview button{
                 background: #3d70b2;
                 border: 1px solid transparent;
                 color: white;
@@ -87,9 +99,21 @@
                 cursor: pointer;
             }
 
+            main #preview button#stopCapture{
+                background: #e63e3e;
+            }
+
+            main[data-capturing="false"] .controls.video #stopCapture{
+                display: none;
+            }
+
+            main[data-capturing="true"] .controls.video #captureVideo{
+                display: none;
+            }
+
         </style>
 
-        <main data-state="inactive">
+        <main data-state="inactive" data-type="still" data-capturing="false">
 
             <div id="activate">
                 <p>click to use camera</p>
@@ -98,10 +122,15 @@
             <div id="preview">
 
                 <canvas> </canvas>
-                <video autoplay playsinline> </video>
+                <video autoplay playsinline muted> </video>
 
                 <div class="controls still">
-                    <button id="capture">Take Picture</div>
+                    <button id="captureStill">Take Picture</button>
+                </div>
+
+                <div class="controls video">
+                    <button id="captureVideo">Record Video</button>
+                    <button id="stopCapture">Stop Recording</button>
                 </div>
 
             </div>
@@ -110,9 +139,11 @@
         </main>
 
     `;
-
+    
     const templateElement = document.createElement('template');
     templateElement.innerHTML = templateString;
+
+    const validCaptureTypes = ['still', 'video'];
 
     document.addEventListener("DOMContentLoaded", function(event) {
         console.log('DOM Loaded, ready to look for components');
@@ -135,26 +166,52 @@
                 const video = domNode.shadowRoot.querySelector('video');
                 const canvas = domNode.shadowRoot.querySelector('canvas');
                 const ctx = canvas.getContext('2d');
+
                 const stillControls = main.querySelector('.controls.still');
-                const stillCapture = stillControls.querySelector('#capture');
+                const stillCapture = stillControls.querySelector('#captureStill');
+
+                const videoControls = main.querySelector('.controls.video');
+                const videoRecord = videoControls.querySelector('#captureVideo');
+                const videoStop = videoControls.querySelector('#stopCapture');
+
+                let captureType = domNode.getAttribute('data-nr-type') || 'still';
+
+                if(validCaptureTypes.indexOf(captureType) === -1){
+                    captureType = 'still';
+                }
+                
+                // Check that capture type is valid, and possible in this browser;
+                if(captureType === 'video'){
+                    if(!window.MediaRecorder){
+                        console.log('MediaRecorder Error:', err);
+                        console.log('Defaulting to still capture');
+                        captureType = 'still';
+                    }
+                }
+
+                main.dataset.type = captureType;
+
+                console.log('Capture type:', captureType);
 
                 function drawVideoToCanvas(){
                     ctx.drawImage(video, 0, 0);
                     requestAnimationFrame(drawVideoToCanvas);
                 }
 
-                function sendImageToServer(image){
+                function sendDataToServer(data, type){
+
+                    type = type || captureType;
 
                     const options = {
                         method : "POST",
                         headers : {
                             "Content-Type" : "application/octet-stream"
                         },
-                        body : image
+                        body : data
                     }
 
-                    console.log(`${window.location.origin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}`);
-                    return fetch(`${window.location.origin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}`, options)
+                    console.log(`${window.location.origin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}?type=${type}`);
+                    return fetch(`${window.location.origin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}?type=${type}`, options)
                         .then(res => {
 
                             if(res.ok){
@@ -201,8 +258,8 @@
                     activate.querySelector('p').textContent = 'attempting to access camera';
 
                     const constraints = {
-                        video : { facingMode: "environment" } ,
-                        audio : false
+                        video : { facingMode: 'environment' },
+                        audio : captureType === 'video'
                     };
 
                     navigator.mediaDevices.getUserMedia(constraints)
@@ -253,9 +310,44 @@
                                 const base64 = canvas.toDataURL('image/png');
                                 const imageData = base64.split(',')[1];
 
-                                sendImageToServer(imageData);
+                                sendDataToServer(imageData);
 
                             }, false);
+
+                            let mR = undefined;
+                            const capturedChunks = [];
+
+                            videoRecord.addEventListener('click', function(){
+                                main.dataset.capturing = 'true';
+                                mR = new MediaRecorder(stream);
+				
+                                mR.ondataavailable = function(e){
+                                    console.log(e.data);
+                                    capturedChunks.push(e.data);
+                                }
+
+                                mR.onstop = function(e){
+                                    capturedChunks.push(e.data);
+
+                                    var video = document.createElement('video');
+                                    video.controls = true;
+                                    var blob = new Blob(capturedChunks, { 'type' : 'audio/webm; codecs=vp8' });
+                                    
+                                    sendDataToServer(blob, captureType);
+                                    
+                                    capturedChunks.length = 0;
+                                    console.log(capturedChunks);
+
+                                }
+
+                                mR.start(800);
+
+                            });
+
+                            videoStop.addEventListener('click', function(){
+                                mR.stop();
+                                main.dataset.capturing = 'false';
+                            });
 
                             drawVideoToCanvas();
 
