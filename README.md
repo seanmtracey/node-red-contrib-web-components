@@ -28,7 +28,7 @@ Having installed the `node-red-contrib-web-components` in your Node-RED instance
 
 ### Polyfill
 
-Not all browsers support web components natively, so you can [include this handy polyfill](https://rawgit.com/webcomponents/webcomponentsjs/master/webcomponents-sd-ce.js) in a `<script>` tag before the `<script>` tags for your web components.
+Not all browsers support web components natively, so you can [include this handy polyfill](https://raw.githubusercontent.com/webcomponents/webcomponentsjs/f38824a19833564d96a5654629faefebb8322ea1/bundles/webcomponents-sd-ce.js) in a `<script>` tag before the `<script>` tags for your web components.
 
 
 ### Script Tags
