@@ -2,53 +2,95 @@ require('dotenv').config( { silent : process.env.NODE_ENV === 'production' } );
 const debug = require('debug')('web-components:component-camera');
 const fs = require('fs');
 
+const MAX_SUCCESS_DISPLAY_TIME = 3000;
+
+const wires = {};
+
 module.exports = function(RED) {
 
     RED.nodes.registerType("component-camera", function(config){
         
+        debug('Creating node:', this, config);
         RED.nodes.createNode(this, config);
     
-        var node = this;
+        const node = this;
         debug('CONFIG:', config);
+        wires[config.id] = config.wires;
 
         if(config.unique && config.unique !== ''){
 
-            RED.httpNode.post(`/nr-component-camera/${config.unique.split('/')[0]}`, function(req, res) {
+            const uniqueID = config.unique.split('/')[0];
+            let timeImageWasRecievedAt = 0;
 
-                const chunks = [];
+            debug('Registering route for component-camera node:', uniqueID)
+            
+            RED.httpNode.post(`/nr-component-camera/${uniqueID}`, function(req, res) {
+                
+                new Promise( (resolve, reject) => {
 
-                req.on('data', function (data) {
-                    debug('Data:', data);
-                    chunks.push(data);
-                });
+                    debug('NODE WIRES BEFORE UPDATE:', node.wires);
+                    node.updateWires(wires[node.id]);
+                    debug('NODE WIRES AFTER UPDATE:', node.wires);
 
-                req.on('end', function (data){
-                    
-                    debug('Request ended:', data);
-
-                    res.json({
-                        status : "ok",
-                        message : "Date received successfully"
+                    const chunks = [];
+    
+                    req.on('data', function (data) {
+                        debug('Data:', data);
+                        chunks.push(data);
                     });
+    
+                    req.on('end', function (data){
+                        
+                        debug('Request ended:', data);
+    
+                        res.json({
+                            status : "ok",
+                            message : "Data received successfully"
+                        });
+                        
+                        let buf;
+                        
+                        if(req.query.type !== 'still' && req.query.type !== 'video'){
+                            reject(`Unknown camera type (should 'still' or video). Refusing to pass on data.`);
+                        } else if(req.query.type === 'still'){
+                            buf = new Buffer( Buffer.concat(chunks).toString(), 'base64' );
+                        } else if(req.query.type === "video"){
+                            buf = Buffer.concat(chunks);
+                        }
+                        
+                        resolve(buf);
+                        
+                    });
+
+                    req.on('error:', function(err){
+                        debug('req err:', err);
+                        reject(err);
+                    });
+
+                })
+                .then(imageBuffer => {
+                    debug('Image received. Emitting...', imageBuffer);
                     
-                    let buf;
-
-                    if(req.query.type === 'still'){
-                        buf = new Buffer( Buffer.concat(chunks).toString(), 'base64' );
-                    } else if(req.query.type === "video"){
-                        buf = Buffer.concat(chunks);
-                    }
-
+                    timeImageWasRecievedAt = new Date() * 1;
+                    node.status({ fill: "green", shape: "ring", text : 'Data received'});
                     node.send({
-                        payload: buf
+                        payload: imageBuffer
                     });
 
-                    // fs.writeFileSync('/tmp/output.webm', buf);
+                    setTimeout(function(){
 
-                });
+                        const currentTime = new Date() * 1;
 
-                req.on('error:', function(err){
-                    debug('req err:', err);
+                        if(currentTime - timeImageWasRecievedAt > MAX_SUCCESS_DISPLAY_TIME){
+                            node.status({ });
+                        }
+
+                    }, 3000);
+
+                })
+                .catch(err => {
+                    node.status({ fill: "red", shape: "ring", text: "Node error" });
+                    node.error(err);
                 });
 
             });
