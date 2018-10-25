@@ -34,7 +34,6 @@
                 display: flex;
                 justify-content: space-between;
                 flex-direction: column;
-                box-shadow: 0 2px 3px rgba(0,0,0,0.32);
                 font-family: sans-serif;
                 font-size: 14px;
                 max-height: 1000px;
@@ -262,14 +261,22 @@
                 
                 const CONNECTION_ID = domNode.getAttribute('data-nr-name');
                 const CHECK_INTERVAL = domNode.getAttribute('data-nr-check-interval') || 1000;
+                const THEME_COLOR = domNode.getAttribute('data-nr-color');
                 let SESSION_UUID;
                 let MESSENGER_CONTEXT;
 
                 const main = domNode.shadowRoot.querySelector('main');
+                const header = main.querySelector('header');
+                const footer = main.querySelector('footer');
                 const closeBtn = main.querySelector('.close');
                 const form = main.querySelector('footer form');
                 const conversation = main.querySelector('div.conversation .record');
                 const silence = conversation.querySelector('#silence');
+
+                if(THEME_COLOR){
+                    header.style.backgroundColor = THEME_COLOR;
+                    footer.style.backgroundColor = THEME_COLOR;
+                }
 
                 fetch(`${chatbotOrigin}/nr-component-chatbot/get-id`)
                     .then(function(res){
