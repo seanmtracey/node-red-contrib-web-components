@@ -281,7 +281,6 @@
                     })
                     .then(function(response){
 
-                        console.log(response);
                         SESSION_UUID = response.data;
 
                     })
@@ -313,7 +312,6 @@
                             }
                         })
                         .then(function(response){
-                            console.log(response);
                             return response;
                         })
                         .catch(function(err){
@@ -365,7 +363,6 @@
                     e.stopImmediatePropagation();
 
                     const message = this[0].value;
-                    console.log(message);
                     
                     if(message !== ""){
                         addMessageToConversation(message, false);
@@ -387,9 +384,9 @@
                                 }
                             })
                             .then(function(response){
-                                // console.log(response);
+
                                 if(response.messages.length > 0){
-                                    console.log(response);
+
                                     response.messages.forEach(function(message){
 
                                         message.output.text.forEach(function(text){
@@ -411,7 +408,6 @@
                 }, CHECK_INTERVAL);
 
                 closeBtn.addEventListener('click', function(){
-                    console.log('Click!');
                     
                     main.dataset.active = main.dataset.active === 'false' ? 'true' : 'false';
                     this.textContent = main.dataset.active === 'false' ? 'open' : 'close';

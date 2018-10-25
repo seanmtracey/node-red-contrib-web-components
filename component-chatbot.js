@@ -7,7 +7,16 @@ const wires = {};
 
 const connectionQueue = {};
 
+const ALLOW_CORS = (req, res, next) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, POST');
+    res.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
+    next();
+};
+
 module.exports = function(RED) {
+
+    RED.httpNode.all('/nr-component-chatbot/*', ALLOW_CORS);
 
     RED.nodes.registerType("component-chatbot-receive", function(config){
         
@@ -17,13 +26,6 @@ module.exports = function(RED) {
         const node = this;
         debug('CONFIG:', config);
         wires[config.id] = config.wires;
-
-        RED.httpNode.all('/nr-component-chatbot/*', (req, res, next) => {
-            res.set('Access-Control-Allow-Origin', '*');
-            res.set('Access-Control-Allow-Methods', 'GET, POST');
-            res.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
-            next();
-        });
 
         if(config.unique && config.unique !== ''){
 
@@ -39,7 +41,7 @@ module.exports = function(RED) {
                     payload : req.body.message,
                     'nr-component-chatbot-id' : req.body.uuid,
                     params : {
-                        context  : req.body.context
+                        context  : req.body.context || {} 
                     }
                 });
 
@@ -74,10 +76,6 @@ module.exports = function(RED) {
             });
 
             RED.httpNode.get(`/nr-component-chatbot/:queueUUID`, function(req, res) {
-                
-                res.set('Access-Control-Allow-Origin', '*');
-                res.set('Access-Control-Allow-Methods', 'GET, POST');
-                res.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
 
                 node.updateWires(wires[node.id]);
                 
@@ -104,14 +102,22 @@ module.exports = function(RED) {
 
     });
 
-    RED.httpNode.all('/web-components/chatbot*', function(req, res, next) {
-        res.set('Access-Control-Allow-Origin', '*');
-        res.set('Access-Control-Allow-Methods', 'GET, POST');
-        res.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
-        next();
+    RED.httpNode.get("/nr-component-chatbot/get-id", function(req, res) {
+
+        const queueUUID = uuid();
+
+        connectionQueue[queueUUID] = {
+            messages : []
+        };
+
+        res.json({
+            status : "ok",
+            data : queueUUID
+        });
+
     });
 
-    RED.httpNode.get("/web-components/chatbot", function(req, res) {
+    RED.httpNode.get("/web-components/chatbot", [ALLOW_CORS], function(req, res) {
     
         fs.readFile(`${__dirname}/component-scripts/chatbot.js`, (err, data) => {
             
@@ -124,25 +130,6 @@ module.exports = function(RED) {
                 res.send(data);
             }
 
-        });
-
-    });
-
-    RED.httpNode.get("/nr-component-chatbot/get-id", function(req, res) {
-
-        res.set('Access-Control-Allow-Origin', '*');
-        res.set('Access-Control-Allow-Methods', 'GET, POST');
-        res.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
-
-        const queueUUID = uuid();
-
-        connectionQueue[queueUUID] = {
-            messages : []
-        };
-
-        res.json({
-            status : "ok",
-            data : queueUUID
         });
 
     });
