@@ -65,40 +65,36 @@ module.exports = function(RED) {
         debug('CONFIG:', config);
         wires[config.id] = config.wires;
 
-        if(config.unique && config.unique !== ''){
+        node.on('input', function(msg) {
 
-            node.on('input', function(msg) {
+            if(msg['nr-component-chatbot-id']){
+                connectionQueue[ msg[ 'nr-component-chatbot-id' ] ].messages.push(msg.payload);
+            }
 
-                if(msg['nr-component-chatbot-id']){
-                    connectionQueue[ msg[ 'nr-component-chatbot-id' ] ].messages.push(msg.payload);
-                }
+        });
 
-            });
+        RED.httpNode.get(`/nr-component-chatbot/:queueUUID`, function(req, res) {
 
-            RED.httpNode.get(`/nr-component-chatbot/:queueUUID`, function(req, res) {
+            node.updateWires(wires[node.id]);
+            
+            const queueUUID = req.params.queueUUID;
 
-                node.updateWires(wires[node.id]);
-                
-                const queueUUID = req.params.queueUUID;
+            if(connectionQueue[queueUUID]){
 
-                if(connectionQueue[queueUUID]){
+                res.json(connectionQueue[queueUUID]);
+                connectionQueue[queueUUID].messages = [];
 
-                    res.json(connectionQueue[queueUUID]);
-                    connectionQueue[queueUUID].messages = [];
+            } else {
 
-                } else {
+                res.status(404);
+                res.json({
+                    status : 'err',
+                    message : `No message queue with id ${queueUUID} was found`
+                });
 
-                    res.status(404);
-                    res.json({
-                        status : 'err',
-                        message : `No message queue with id ${queueUUID} was found`
-                    });
+            }
 
-                }
-
-            });
-
-        }
+        });
 
     });
 
