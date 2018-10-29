@@ -262,6 +262,7 @@
                 const CONNECTION_ID = domNode.getAttribute('data-nr-name');
                 const CHECK_INTERVAL = domNode.getAttribute('data-nr-check-interval') || 1000;
                 const THEME_COLOR = domNode.getAttribute('data-nr-color');
+                const INITIAL_OPEN_STATE = domNode.getAttribute('data-nr-opened');
                 let SESSION_UUID;
                 let MESSENGER_CONTEXT;
 
@@ -276,6 +277,10 @@
                 if(THEME_COLOR){
                     header.style.backgroundColor = THEME_COLOR;
                     footer.style.backgroundColor = THEME_COLOR;
+                }
+
+                if(INITIAL_OPEN_STATE ===  "true"){
+                    toggleDrawer()
                 }
 
                 fetch(`${chatbotOrigin}/nr-component-chatbot/get-id`)
@@ -414,11 +419,13 @@
 
                 }, CHECK_INTERVAL);
 
-                closeBtn.addEventListener('click', function(){
-                    
+                function toggleDrawer(){
                     main.dataset.active = main.dataset.active === 'false' ? 'true' : 'false';
-                    this.textContent = main.dataset.active === 'false' ? 'open' : 'close';
+                    closeBtn.textContent = main.dataset.active === 'false' ? 'open' : 'close';
+                }
 
+                closeBtn.addEventListener('click', function(){
+                    toggleDrawer();
                 }, false);
 
                 function dispatchEvent(name, data){
