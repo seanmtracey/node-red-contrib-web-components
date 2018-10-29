@@ -20,7 +20,7 @@ module.exports = function(RED) {
         if(config.unique && config.unique !== ''){
 
             const uniqueID = config.unique.split('/')[0];
-            let timeImageWasRecievedAt = 0;
+            let timeImageWasreceivedAt = 0;
 
             debug('Registering route for component-camera node:', uniqueID)
             
@@ -71,7 +71,7 @@ module.exports = function(RED) {
                 .then(imageBuffer => {
                     debug('Image received. Emitting...', imageBuffer);
                     
-                    timeImageWasRecievedAt = new Date() * 1;
+                    timeImageWasreceivedAt = new Date() * 1;
                     node.status({ fill: "green", shape: "ring", text : 'Data received'});
                     node.send({
                         payload: imageBuffer
@@ -81,7 +81,7 @@ module.exports = function(RED) {
 
                         const currentTime = new Date() * 1;
 
-                        if(currentTime - timeImageWasRecievedAt > MAX_SUCCESS_DISPLAY_TIME){
+                        if(currentTime - timeImageWasreceivedAt > MAX_SUCCESS_DISPLAY_TIME){
                             node.status({ });
                         }
 
@@ -99,9 +99,9 @@ module.exports = function(RED) {
 
     });
 
-    RED.httpNode.get("/web-components/:type", function(req, res) {
-        
-        fs.readFile(`${__dirname}/component-scripts/${req.params.type}.js`, (err, data) => {
+    RED.httpNode.get("/web-components/camera", function(req, res) {
+    
+        fs.readFile(`${__dirname}/component-scripts/camera.js`, (err, data) => {
             
             if(err){
                 debug('FS err:', err);

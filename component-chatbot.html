@@ -1,0 +1,75 @@
+<script type="text/javascript">
+  
+    RED.nodes.registerType('component-chatbot-receive',{
+        category: 'Web Components',
+        color: '#56FBAB',
+        defaults: {
+            name: {
+                value: ""
+            },
+            unique : {
+                value : ""
+            }
+        },
+        inputs:0,
+        outputs:1,
+        icon: "component-chatbot-receive.png",
+        label: function() {
+            return this.name || "Chatbot In";
+        },
+        oneditprepare : function(){
+            var node = this;
+        }
+    });
+
+    RED.nodes.registerType('component-chatbot-reply',{
+        category: 'Web Components',
+        color: '#56FBAB',
+        defaults: {
+            name: {
+                value: ""
+            }
+        },
+        inputs:1,
+        outputs:0,
+        icon: "component-chatbot-reply.png",
+        label: function() {
+            return this.name || "Chatbot Out";
+        },
+        oneditprepare : function(){
+            var node = this;
+        }
+    });
+
+</script>
+
+<script type="text/x-red" data-template-name="component-chatbot-receive">
+   
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-unique"><i class="icon-tag"></i>Connection ID</label>
+        <input type="text" id="node-input-unique" placeholder="Enter a unique name" />
+    </div>
+
+</script>
+
+<script type="text/x-red" data-help-name="component-chatbot-receive">
+    <p>A node that receives messages from a client-side chatbot web component</p>
+</script>
+
+<script type="text/x-red" data-template-name="component-chatbot-reply">
+   
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+</script>
+
+<script type="text/x-red" data-help-name="component-chatbot-reply">
+    <p>A node that replies to messages sent from a client-side chatbot web component</p>
+</script>

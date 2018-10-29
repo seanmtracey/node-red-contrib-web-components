@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-web-components",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Expose useful functionality to Node-RED developers through the magic of Web Components",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,6 +12,7 @@
   "keywords": [
     "Node-RED",
     "getUserMedia",
+    "chatbot",
     "multipart",
     "IBM"
   ],
@@ -23,11 +24,13 @@
   "homepage": "https://github.com/seanmtracey/node-red-web-components#readme",
   "dependencies": {
     "debug": "^3.1.0",
-    "dotenv": "^5.0.1"
+    "dotenv": "^5.0.1",
+    "uuid": "^3.3.2"
   },
   "node-red": {
     "nodes": {
-      "component-camera": "component-camera.js"
+      "component-camera": "component-camera.js",
+      "component-chatbot": "component-chatbot.js"
     }
   }
 }

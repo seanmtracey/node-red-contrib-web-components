@@ -28,8 +28,12 @@ Having installed the `node-red-contrib-web-components` in your Node-RED instance
 
 ### Polyfill
 
-Not all browsers support web components natively, so you can [include this handy polyfill](https://raw.githubusercontent.com/webcomponents/webcomponentsjs/f38824a19833564d96a5654629faefebb8322ea1/bundles/webcomponents-sd-ce.js) in a `<script>` tag before the `<script>` tags for your web components.
+Not all browsers support web components natively, but you can include the following shim/polyfills in the `<head>` of each web page that you use your components in to increase the availability of your chosen web components.
 
+```
+<script src="https://unpkg.com/@webcomponents/custom-elements"></script>
+<script src="https://unpkg.com/@webcomponents/shadydom"></script>
+```
 
 ### Script Tags
 
@@ -48,52 +52,16 @@ You can also have an absolute URL if you have a cloud-based Node-RED instance, b
 
 ## Available Nodes
 
-### component-camera
+### Camera
+[component-camera](/docs/component-camera.md)
 
-This node / component pair creates a GUI in a web page which enables the user to capture still images and capture video.
+![Chatbot nodes](/docs/images/camera-nodes.png)
 
-**Script tag for Head**
+### Chatbot
+[component-chatbot](/docs/component-chatbot.md)
 
-```HTML
-<script src="/web-components/camera"></script>
-```
+![Chatbot nodes](/docs/images/chatbot-nodes.png)
 
-**HTML Node**
-
-```HTML
-<node-red-camera data-nr-name="camera1"></node-red-camera>
-```
-This is the minimum required for the node to work. It will create a GUI that allows the user to activate the camera in a browser and take a still image which will be passed to the Node.
-
-**Additional Attributes**
-
-`data-nr-type`
-
-If this attribute is added to the node it can be set to `still` to capture still images or `video` if you want to capture video.
-
-**Events**
-
-There are events that can be listened to on the DOM element when certain interactions and events happen. They are as follows:
-
-#### message
-
-This event will be fired when the Node-RED instance has receievd the image or video captured.
-
-#### error
-
-This event will be fired when an error has occurred somewhere in the component.
-
-#### streamavailable
-
-This event will be fired when a media stream has been created for the web component. The stream is accessible on the `detail` property of the event.
-
-#### imageavailable
-
-This event will be fired once an image has been captured. The base64 for the image can be accessed on the `detail` property of the event.
-
-#### videoavailable
-
-This event will be fired once a video has been captured. The blob for the video can be accessed on the `detail` property of the event.
 
 ## Additional Nodes
 
