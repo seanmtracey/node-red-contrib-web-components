@@ -3,6 +3,8 @@
 
 This node / component pair creates a GUI in a web page which enables the user to capture still images and capture video.
 
+![Camera video](/docs/images/component-camera-demo.gif)
+
 **Script tag for Head**
 
 ```HTML
