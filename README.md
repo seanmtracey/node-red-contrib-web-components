@@ -48,6 +48,17 @@ You can also have an absolute URL if you have a cloud-based Node-RED instance, b
 
 ## Available Nodes
 
+### Camera
+[component-camera](/docs/component-camera.md)
+
+![Chatbot nodes](/docs/images/camera-nodes.png)
+
+### Chatbot
+[component-chatbot](/docs/component-chatbot.md)
+
+![Chatbot nodes](/docs/images/chatbot-nodes.png)
+
+
 ## Additional Nodes
 
 Only the camera-component is currently complete, but I think the following as a minimum set will make it much easier to build web apps that integrate well with Node-RED nodes.
