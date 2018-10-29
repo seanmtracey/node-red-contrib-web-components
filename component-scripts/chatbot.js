@@ -202,7 +202,7 @@
         <main data-active="false">
             
             <header>
-                <span>Watson Chatbot Component</span>
+                <span>Chatbot Component</span>
                 <a class="close">open</a>
             </header>
             
@@ -260,9 +260,10 @@
                 const chatbotOrigin = domNode.getAttribute('data-nr-origin') || window.location.origin;
                 
                 const CONNECTION_ID = domNode.getAttribute('data-nr-name');
-                const CHECK_INTERVAL = domNode.getAttribute('data-nr-check-interval') || 1000;
+                const CHECK_INTERVAL = Number(domNode.getAttribute('data-nr-check-interval')) || 1000;
                 const THEME_COLOR = domNode.getAttribute('data-nr-color');
                 const INITIAL_OPEN_STATE = domNode.getAttribute('data-nr-opened');
+                const TITLE = domNode.getAttribute('data-nr-title');
                 let SESSION_UUID;
                 let MESSENGER_CONTEXT;
 
@@ -281,6 +282,10 @@
 
                 if(INITIAL_OPEN_STATE ===  "true"){
                     toggleDrawer()
+                }
+                
+                if(TITLE){
+                    header.querySelector('span').textContent = TITLE;
                 }
 
                 fetch(`${chatbotOrigin}/nr-component-chatbot/get-id`)
