@@ -14,7 +14,7 @@ This node / component pair creates a GUI in a web page which will create a GUI t
 **HTML Node**
 
 ```HTML
-<node-red-camera data-nr-name="chatbot1"></node-red-camera>
+<node-red-chatbot data-nr-name="chatbot1"></node-red-chatbot>
 ```
 This is the minimum required for the node to work.
 
