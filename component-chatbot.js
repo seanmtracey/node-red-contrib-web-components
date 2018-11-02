@@ -76,6 +76,21 @@ module.exports = function(RED) {
 
         });
 
+        RED.httpNode.get("/nr-component-chatbot/get-id", function(req, res) {
+
+            const queueUUID = uuid();
+    
+            connectionQueue[queueUUID] = {
+                messages : []
+            };
+    
+            res.json({
+                status : "ok",
+                data : queueUUID
+            });
+    
+        });
+
         RED.httpNode.get(`/nr-component-chatbot/:queueUUID`, function(req, res) {
 
             node.updateWires(wires[node.id]);
@@ -97,21 +112,6 @@ module.exports = function(RED) {
 
             }
 
-        });
-
-    });
-
-    RED.httpNode.get("/nr-component-chatbot/get-id", function(req, res) {
-
-        const queueUUID = uuid();
-
-        connectionQueue[queueUUID] = {
-            messages : []
-        };
-
-        res.json({
-            status : "ok",
-            data : queueUUID
         });
 
     });
