@@ -35,7 +35,10 @@ module.exports = function(RED) {
 
                 node.updateWires(wires[node.id]);
                 
-                console.log(req.body);
+                if(process.env.ADDITIONAL_DEBUG === true){
+                    debug("REQUEST:", req);
+                    debug("REQUEST_BODY:", req.body);
+                }
 
                 node.send({
                     payload : req.body.message,
