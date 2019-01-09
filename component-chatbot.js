@@ -2,6 +2,7 @@ require('dotenv').config( { silent : process.env.NODE_ENV === 'production' } );
 const debug = require('debug')('web-components:component-chatbot');
 const fs = require('fs');
 const uuid = require('uuid/v4');
+const bodyParser = require('body-parser');
 
 const wires = {};
 
@@ -32,7 +33,7 @@ module.exports = function(RED) {
             const uniqueID = config.unique.split('/')[0];
             debug(`Registering route: /nr-component-chatbot/${uniqueID}`);
 
-            RED.httpNode.post(`/nr-component-chatbot/${uniqueID}`, function(req, res) {
+            RED.httpNode.post(`/nr-component-chatbot/${uniqueID}`, bodyParser.json(), function(req, res) {
 
                 debug(`Path ${req.originalUrl} hit.`);
                 node.updateWires(wires[node.id]);
