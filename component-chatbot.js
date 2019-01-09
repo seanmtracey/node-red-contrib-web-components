@@ -30,6 +30,7 @@ module.exports = function(RED) {
         if(config.unique && config.unique !== ''){
 
             const uniqueID = config.unique.split('/')[0];
+            debug(`Registering route: /nr-component-chatbot/${uniqueID}`);
 
             RED.httpNode.post(`/nr-component-chatbot/${uniqueID}`, function(req, res) {
 
@@ -55,6 +56,8 @@ module.exports = function(RED) {
                 
             });
 
+        } else {
+            debug(`'config' failed to meet requirements to register route. config.unique is ${config.unique}`);
         }
 
     });
