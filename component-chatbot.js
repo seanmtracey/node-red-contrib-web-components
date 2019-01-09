@@ -34,9 +34,10 @@ module.exports = function(RED) {
 
             RED.httpNode.post(`/nr-component-chatbot/${uniqueID}`, function(req, res) {
 
+                debug(`Path ${req.originalUrl} hit.`);
                 node.updateWires(wires[node.id]);
                 
-                if(process.env.ADDITIONAL_DEBUG === true){
+                if(process.env.ADDITIONAL_DEBUG){
                     debug("REQUEST:", req);
                     debug("REQUEST_BODY:", req.body);
                 }
@@ -73,6 +74,8 @@ module.exports = function(RED) {
 
         node.on('input', function(msg) {
 
+            debug('Reply node recieved input:', JSON.stringify(msg));
+
             if(msg['nr-component-chatbot-id']){
                 connectionQueue[ msg[ 'nr-component-chatbot-id' ] ].messages.push(msg.payload);
             }
@@ -82,6 +85,7 @@ module.exports = function(RED) {
         RED.httpNode.get("/nr-component-chatbot/get-id", function(req, res) {
 
             const queueUUID = uuid();
+            debug('New UUID for chatbot requested and created:', queueUUID);
     
             connectionQueue[queueUUID] = {
                 messages : []
@@ -94,7 +98,9 @@ module.exports = function(RED) {
     
         });
 
-        RED.httpNode.get(`/nr-component-chatbot/:queueUUID`, function(req, res) {
+        RED.httpNode.get(`/nr-component-chatbot/check-messages/:queueUUID`, function(req, res) {
+
+            debug(`Checking messages at ${req.originalUrl}`);
 
             node.updateWires(wires[node.id]);
             
@@ -106,6 +112,8 @@ module.exports = function(RED) {
                 connectionQueue[queueUUID].messages = [];
 
             } else {
+
+                debug(`Request tried to check for message queue that doesn't exist: ${req.params.queueUUID}`);
 
                 res.status(404);
                 res.json({

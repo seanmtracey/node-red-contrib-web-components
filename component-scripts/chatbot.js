@@ -392,7 +392,7 @@
                 const checker = setInterval(function(){
 
                     if(SESSION_UUID){
-                        fetch(`${chatbotOrigin}/nr-component-chatbot/${SESSION_UUID}`)
+                        fetch(`${chatbotOrigin}/nr-component-chatbot/check-messages/${SESSION_UUID}`)
                             .then(function(res){
                                 if(res.ok){
                                     return res.json();
