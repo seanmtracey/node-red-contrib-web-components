@@ -283,7 +283,7 @@
                                 video.src = vidURL;
                             } catch(err){
 
-                                console.log('err:', err);
+                                console.log('Unable to createObjectURL for stream. Setting srcObject to stream instead...');
                                 video.srcObject = stream;
 
                                 setTimeout(function(){
@@ -294,6 +294,8 @@
                                 }, 1000);
 
                             }
+
+                            video.volume = 0;
 
                             stillCapture.addEventListener('click', function(){
 
