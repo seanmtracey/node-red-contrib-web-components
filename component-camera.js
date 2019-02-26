@@ -42,7 +42,11 @@ module.exports = function(RED) {
                     req.on('end', function (data){
                         
                         debug('Request ended:', data);
-    
+                        
+                        res.set('Access-Control-Allow-Origin', '*');
+                        res.set('Access-Control-Allow-Methods', 'GET, POST');
+                        res.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
+
                         res.json({
                             status : "ok",
                             message : "Data received successfully"
