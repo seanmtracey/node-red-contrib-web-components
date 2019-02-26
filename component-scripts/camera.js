@@ -175,6 +175,7 @@
                 const videoStop = videoControls.querySelector('#stopCapture');
 
                 let captureType = domNode.getAttribute('data-nr-type') || 'still';
+                const instanceOrigin = domNode.getAttribute('data-nr-origin')|| window.location.origin;
 
                 if(validCaptureTypes.indexOf(captureType) === -1){
                     captureType = 'still';
@@ -210,8 +211,8 @@
                         body : data
                     };
 
-                    console.log(`${window.location.origin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}?type=${type}`);
-                    return fetch(`${window.location.origin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}?type=${type}`, options)
+                    console.log(`${instanceOrigin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}?type=${type}`);
+                    return fetch(`${instanceOrigin}/nr-component-camera/${domNode.getAttribute('data-nr-name')}?type=${type}`, options)
                         .then(res => {
 
                             if(res.ok){
