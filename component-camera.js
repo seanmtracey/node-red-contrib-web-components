@@ -33,6 +33,10 @@ module.exports = function(RED) {
                     debug('NODE WIRES AFTER UPDATE:', node.wires);
 
                     const chunks = [];
+
+                    res.set('Access-Control-Allow-Origin', '*');
+                    res.set('Access-Control-Allow-Methods', 'GET, POST');
+                    res.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
     
                     req.on('data', function (data) {
                         debug('Data:', data);
@@ -42,10 +46,6 @@ module.exports = function(RED) {
                     req.on('end', function (data){
                         
                         debug('Request ended:', data);
-                        
-                        res.set('Access-Control-Allow-Origin', '*');
-                        res.set('Access-Control-Allow-Methods', 'GET, POST');
-                        res.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
 
                         res.json({
                             status : "ok",
