@@ -40,6 +40,10 @@ Thiis value sets the origin for the Node-RED instance that your web component wi
  
 This attribute will set the title of the chat window. By default, it will be "Chatbot Component".
 
+`data-nr-trigger-welcome="true"`
+
+If your chatbot has a welcome intent that is triggered by an empty payload, an empty message will be sent on the components activation to get the content. *Defaults to "false"*
+
 ## Events
 
 There are currently no events that can be listened to on this component. They will be added in future release.

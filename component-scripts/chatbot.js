@@ -264,6 +264,7 @@
                 const THEME_COLOR = domNode.getAttribute('data-nr-color');
                 const INITIAL_OPEN_STATE = domNode.getAttribute('data-nr-opened');
                 const TITLE = domNode.getAttribute('data-nr-title');
+                const TRIGGER_WELCOME = domNode.getAttribute('data-nr-trigger-welcome');
                 let SESSION_UUID;
                 let MESSENGER_CONTEXT;
 
@@ -299,6 +300,9 @@
                     .then(function(response){
 
                         SESSION_UUID = response.data;
+                        if(TRIGGER_WELCOME === "true"){
+                            sendMessageToServer("");
+                        }
 
                     })
                     .catch(function(err){
