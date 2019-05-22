@@ -24,6 +24,24 @@ This is the minimum required for the node to work. It will create a GUI that all
 
 If this attribute is added to the node it can be set to `still` to capture still images or `video` if you want to capture video.
 
+`data-nr-hide-controls="true"`
+
+If this attribute is added to the node it can be set to `true` to hide the controls for both the still and video capture. The camera feed will still be displayed, but image / video capture will need to be triggered with the methods on the node.
+
+## Methods
+
+`trigger()`
+
+Calling this function will cause the component to capture an image. It behaves exactly the same as if "Take Picture" button on the element had been pressed;
+
+`startCapture()`
+
+Calling this function will cause the component to start recording video. It behaves exactly the same as if "Record Video" button on the element had been pressed;
+
+`stopCapture()`
+
+Calling this function will cause the component to stop recording video. It behaves exactly the same as if "Stop Recording" button on the element had been pressed;
+
 ## Events
 
 There are events that can be listened to on the DOM element when certain interactions and events happen. They are as follows:

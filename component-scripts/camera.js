@@ -36,6 +36,14 @@
                 display: none;
             }
 
+            main[data-type="video"] #preview .controls.still{
+                display: none;
+            }
+
+            main[data-hide-controls="true"] #preview .controls{
+                display: none;
+            }
+
             main #activate, main #preview{
                 border: 1px solid #c7c7c7;
             }
@@ -155,7 +163,7 @@
 
                 const domNode = this;
 
-                domNode.attachShadow({mode: 'open'});
+                domNode.attachShadow( { mode: 'open' } );
                 domNode.shadowRoot.appendChild(document.importNode(templateElement.content, true));
 
                 const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
@@ -175,7 +183,8 @@
                 const videoStop = videoControls.querySelector('#stopCapture');
 
                 let captureType = domNode.getAttribute('data-nr-type') || 'still';
-                const instanceOrigin = domNode.getAttribute('data-nr-origin')|| window.location.origin;
+                const instanceOrigin = domNode.getAttribute('data-nr-origin') || window.location.origin;
+                const hideControls = domNode.getAttribute('data-nr-hide-controls') || "false";
 
                 if(validCaptureTypes.indexOf(captureType) === -1){
                     captureType = 'still';
@@ -193,6 +202,10 @@
                 main.dataset.type = captureType;
 
                 console.log('Capture type:', captureType);
+
+                if(hideControls === "true"){
+                    main.setAttribute('data-hide-controls', 'true');
+                }
 
                 function drawVideoToCanvas(){
                     ctx.drawImage(video, 0, 0);
@@ -243,6 +256,70 @@
                     domNode.dispatchEvent(event);
                 }
 
+                function takePicture(){
+                    const base64 = canvas.toDataURL('image/png');
+                    const imageData = base64.split(',')[1];
+
+                    dispatchEvent('imageavailable', base64);
+
+                    sendDataToServer(imageData);
+                }
+
+                let currentStream = undefined;
+                let mR = undefined;
+                const capturedChunks = [];
+
+                function startVideo(){
+                    main.dataset.capturing = 'true';
+                    mR = new MediaRecorder(currentStream);
+    
+                    mR.ondataavailable = function(e){
+                        console.log(e.data);
+                        capturedChunks.push(e.data);
+                    }
+
+                    mR.onstop = function(e){
+                        capturedChunks.push(e.data);
+
+                        var video = document.createElement('video');
+                        video.controls = true;
+                        var blob = new Blob(capturedChunks, { 'type' : 'audio/webm; codecs=vp8' });
+                        
+                        dispatchEvent('videoavailable', blob);
+
+                        sendDataToServer(blob, captureType);
+                        
+                        capturedChunks.length = 0;
+                        console.log(capturedChunks);
+
+                    }
+
+                    mR.start(800);
+                }
+
+                function stopVideo(){
+                    mR.stop();
+                    main.dataset.capturing = 'false';
+                }
+
+                // Allow developers to trigger capturing a still 
+                // from thier own code.
+                domNode.trigger = function(){
+                    takePicture();
+                }
+
+                // Allow developers to start recording
+                // video with their own code.
+                domNode.startCapture = function(){
+                    startVideo();
+                };
+
+                // Allow developers to stop capturing video if
+                // a stream exists to be stopped.
+                domNode.stopCapture = function(){
+                    stopVideo();
+                };
+
                 activate.addEventListener('click', function(){
 
                     if(activated){
@@ -262,6 +339,7 @@
                         .then(function(stream) {
                             console.log(stream);
 
+                            currentStream = stream;
                             const externalStream = stream.clone();
 
                             video.addEventListener('canplay', function(){
@@ -299,51 +377,15 @@
                             video.volume = 0;
 
                             stillCapture.addEventListener('click', function(){
-
-                                const base64 = canvas.toDataURL('image/png');
-                                const imageData = base64.split(',')[1];
-
-                                dispatchEvent('imageavailable', base64);
-
-                                sendDataToServer(imageData);
-
-                            }, false);
-
-                            let mR = undefined;
-                            const capturedChunks = [];
+                                takePicture();
+                            }, false);  
 
                             videoRecord.addEventListener('click', function(){
-                                main.dataset.capturing = 'true';
-                                mR = new MediaRecorder(stream);
-				
-                                mR.ondataavailable = function(e){
-                                    console.log(e.data);
-                                    capturedChunks.push(e.data);
-                                }
-
-                                mR.onstop = function(e){
-                                    capturedChunks.push(e.data);
-
-                                    var video = document.createElement('video');
-                                    video.controls = true;
-                                    var blob = new Blob(capturedChunks, { 'type' : 'audio/webm; codecs=vp8' });
-                                    
-                                    dispatchEvent('videoavailable', blob);
-
-                                    sendDataToServer(blob, captureType);
-                                    
-                                    capturedChunks.length = 0;
-                                    console.log(capturedChunks);
-
-                                }
-
-                                mR.start(800);
-
+                                startVideo();
                             });
 
                             videoStop.addEventListener('click', function(){
-                                mR.stop();
-                                main.dataset.capturing = 'false';
+                                stopVideo();
                             });
 
                             drawVideoToCanvas();
@@ -356,8 +398,6 @@
 
                         })
                     ;
-
-
 
                 }, false);
 
